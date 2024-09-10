@@ -48,26 +48,30 @@ bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon)
 		return false;
 	}
 
-	if (!redimensionar_vector_pokemones(pokedex)) {
-		return false;
-	}
-
-	char* nueva_ubicacion_nombre = malloc(strlen(pokemon.nombre)+1 * sizeof(char));
+	char* nueva_ubicacion_nombre = malloc((strlen(pokemon.nombre) + 1) * sizeof(char));
 	if (!nueva_ubicacion_nombre) {
 		return false;
 	}
+
+	// si es que no está el nombre en la pokedex
 	strcpy(nueva_ubicacion_nombre, pokemon.nombre);
 	pokemon.nombre = nueva_ubicacion_nombre;
 
-
 	size_t posicion_del_pokemon = pokedex_iterar_pokemones(pokedex, buscar_posicion, pokemon.nombre);
 
-	for (size_t i = pokedex->cantidad_pokemones; i > posicion_del_pokemon; i--) {
-		pokedex->vector_pokemones[i] = pokedex->vector_pokemones[i - 1];
+	if (posicion_del_pokemon < pokedex->cantidad_pokemones && strcmp(pokemon.nombre, pokedex->vector_pokemones[posicion_del_pokemon].nombre) == 0) {
+		free(pokedex->vector_pokemones[posicion_del_pokemon].nombre);
+	} else {
+		if (!redimensionar_vector_pokemones(pokedex)) {
+			return false;
+		}
+		for (size_t i = pokedex->cantidad_pokemones; i > posicion_del_pokemon; i--) {
+			pokedex->vector_pokemones[i] = pokedex->vector_pokemones[i - 1];
+		}
+		pokedex->cantidad_pokemones++;
 	}
 
 	pokedex->vector_pokemones[posicion_del_pokemon] = pokemon;
-	pokedex->cantidad_pokemones++;
 	return true;
 }
 

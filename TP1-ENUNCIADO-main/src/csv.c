@@ -44,7 +44,12 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 	}
 
 	struct Partes* partes = dividir_string(texto, archivo->separador);
-	if (!partes) {
+	if (!partes || partes->cantidad == 0) {
+		return columna_posicion;
+	}
+
+	if (partes->cantidad == 0) {
+		liberar_partes(partes);
 		return columna_posicion;
 	}
 

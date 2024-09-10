@@ -5,6 +5,7 @@
 
 #define CANT_TIPOS 7
 const size_t CANT_COLUMNAS = 5;
+const size_t VACIO = 0;
 
 // ---- Structura para llevar contabilidad ------
 // ----------- de los tipos de pokemon ----------
@@ -67,14 +68,6 @@ struct tipos_pokemon inicializar_tipos() {
     return tipos_totales;
 }
 
-void procesar_informacion_pokemon(struct pokemon* pokemon, char* nombre, char tipo, int fuerza, int destreza, int resistencia) {
-		strcpy(pokemon->nombre, nombre);
-		pokemon->tipo = tipo;
-		pokemon->fuerza = fuerza;
-		pokemon->destreza = destreza;
-		pokemon->resistencia = resistencia;
-}
-
 
 void finalizar_programa(struct pokedex *pokedex, struct archivo_csv *archivo)
 {
@@ -85,20 +78,20 @@ void finalizar_programa(struct pokedex *pokedex, struct archivo_csv *archivo)
 int main(int argc, char const *argv[])
 {
 	if (argc < 2) {
-		perror("No hay archivo");
+		perror("No hay archivo para ejecutar\n");
 		return -1;
 	}
 
 	struct archivo_csv *archivo = abrir_archivo_csv(argv[1], ';');
 	if (!archivo) {
-		perror("No se pudo inicializar el archivo");
+		perror("No se pudo inicializar el archivo\n");
 		return -2;
 	}
 
 	struct pokedex *pokedex = pokedex_crear();
 	if (!pokedex) {
 		cerrar_archivo_csv(archivo);
-		perror("No se pudo inicializar la pokedex");
+		perror("No se pudo inicializar la pokedex\n");
 		return -3;
 	}
 
@@ -107,34 +100,41 @@ int main(int argc, char const *argv[])
 					 agregar_numero, agregar_numero,
 					 agregar_numero };
 	
-	char *nombre = NULL;
-	char tipo;
-	int fuerza;
-	int destreza;
-	int resistencia;
-	void *punteros[] = { &nombre, &tipo, &fuerza, &destreza,
-					  &resistencia };
+	size_t lineas_leidas = VACIO;
+
 	struct pokemon pokemon;
+	char *nombre = NULL;
+	void *punteros[] = { &nombre, &pokemon.tipo, &pokemon.fuerza, &pokemon.destreza,
+					  &pokemon.resistencia };
+
 	while (leer_linea_csv(archivo, CANT_COLUMNAS, funciones, punteros) ==
 	       CANT_COLUMNAS) {
 		pokemon.nombre = malloc((strlen(nombre) + 1) * sizeof(char));
 		if (!pokemon.nombre) {
-			printf("Pokemon %s no pudo ser asignado a la pokedex, problema con asignar memoria",
+			fprintf(stderr, "Pokemon %s no pudo ser asignado a la pokedex, problema con asignar memoria\n",
 			       nombre);
 		} else {
-			procesar_informacion_pokemon(&pokemon, nombre, tipo, fuerza, destreza, resistencia);
-			pokedex_agregar_pokemon(pokedex, pokemon);
+			strcpy(pokemon.nombre, nombre);
+			if (!pokedex_agregar_pokemon(pokedex, pokemon)) {
+			fprintf(stderr, "Pokemon %s no pudo ser asignado a la pokedex, problema con la funcion agregar pokemon\n",
+			       nombre);				
+			}
 			free(pokemon.nombre);
 			free(nombre);
 		}
+		lineas_leidas++;
 	};
 
+	if (lineas_leidas == VACIO) {
+		fprintf(stderr, "Archivo Vacio\n");
+		finalizar_programa(pokedex, archivo);
+		return -4;
+	}
+
 	struct tipos_pokemon tipos_totales = inicializar_tipos();
-	
 	pokedex_iterar_pokemones(pokedex, mostrar_pokemones_y_contar_tipos, &tipos_totales);
 
 	printf("Cantidad de pokemones de cada tipo:\n");
-
 	for (int i = 0; i < CANT_TIPOS; i++) {
 		printf("%s: %ld\n", tipos_totales.tipos[i], tipos_totales.vector_tipos_cantidades[i]);
 	}

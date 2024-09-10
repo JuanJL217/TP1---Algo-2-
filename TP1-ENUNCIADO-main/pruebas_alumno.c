@@ -161,6 +161,10 @@ void agregarVariosPokemones()
 	pokedex_destruir(pokedex);
 }
 
+void agregaDosPokemonesConIgualNombre() {
+	
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de archivos CSV");
@@ -179,6 +183,8 @@ int main()
 	agregarUnPokemon();
 	pa2m_nuevo_grupo("Prueba se agregan varios pokemones");
 	agregarVariosPokemones();
+	pa2m_nuevo_grupo("Prueba pokemon repetidos");
+	agregaDosPokemonesConIgualNombre();
 	pa2m_nuevo_grupo("Prueba con buscador de pokemon");
 	// Datos NULL
 	// Se busca pokemon inexistente
