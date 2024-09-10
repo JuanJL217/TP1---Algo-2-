@@ -4,7 +4,18 @@
 #include <string.h>
 
 #define CANT_TIPOS 7
-#define CANT_COLUMNAS 5
+const size_t CANT_COLUMNAS = 5;
+
+// ---- Structura para llevar contabilidad ------
+// ----------- de los tipos de pokemon ----------
+
+struct tipos_pokemon {
+	const char* tipos[CANT_TIPOS];
+	const char tipos_caracteres[CANT_TIPOS];
+	size_t vector_tipos_cantidades[CANT_TIPOS];
+};
+
+// ----- Funciones para parsear datos de la lectura -------
 
 bool agregar_nombre(const char *str, void *ctx)
 {
@@ -27,29 +38,43 @@ bool agregar_numero(const char *str, void *ctx)
 	return sscanf(str, "%d", (int *)ctx) == 1;
 }
 
-bool mostrar_pokemons(struct pokemon *pokemon, void *ctx)
-{
+// ------- Funcion para usar la iteracion de la pokedex --------
+
+bool mostrar_pokemones_y_contar_tipos(struct pokemon *pokemon, void *ctx)
+{	
+	struct tipos_pokemon* tipos_totales = (struct tipos_pokemon*) ctx;
+
+	for (int i = 0; i < CANT_TIPOS; i++) {
+		if (pokemon->tipo == tipos_totales->tipos_caracteres[i]) {
+			tipos_totales->vector_tipos_cantidades[i]++;
+			break;
+		}
+	}
 	printf("NOMBRE: %s, TIPO: %c, FUERZA: %d, DESTREZA: %d, RESISTENCIA: %d\n",
 	       pokemon->nombre, pokemon->tipo, pokemon->fuerza,
 	       pokemon->destreza, pokemon->resistencia);
 	return true;
 }
 
-bool contar_tipos(struct pokemon *pokemon, void *ctx)
-{
-	int *contador_tipos = (int *)ctx;
-	const char tipos_pokemon_caracter[CANT_TIPOS] = {
-		TIPO_AGUA,	TIPO_FUEGO,  TIPO_PLANTA, TIPO_ROCA,
-		TIPO_ELECTRICO, TIPO_NORMAL, TIPO_LUCHA
-	};
-	for (int i = 0; i < CANT_TIPOS; i++) {
-		if (pokemon->tipo == tipos_pokemon_caracter[i]) {
-			contador_tipos[i]++;
-			break;
-		}
-	}
-	return true;
+// ------- Funciones extras -------
+
+struct tipos_pokemon inicializar_tipos() {
+    struct tipos_pokemon tipos_totales = {
+        .tipos = { "Agua", "Fuego", "Planta", "Roca", "Electrico", "Normal", "Lucha" },
+        .tipos_caracteres = { TIPO_AGUA, TIPO_FUEGO, TIPO_PLANTA, TIPO_ROCA, TIPO_ELECTRICO, TIPO_NORMAL, TIPO_LUCHA },
+        .vector_tipos_cantidades = { 0, 0, 0, 0, 0, 0, 0 },
+    };
+    return tipos_totales;
 }
+
+void procesar_informacion_pokemon(struct pokemon* pokemon, char* nombre, char tipo, int fuerza, int destreza, int resistencia) {
+		strcpy(pokemon->nombre, nombre);
+		pokemon->tipo = tipo;
+		pokemon->fuerza = fuerza;
+		pokemon->destreza = destreza;
+		pokemon->resistencia = resistencia;
+}
+
 
 void finalizar_programa(struct pokedex *pokedex, struct archivo_csv *archivo)
 {
@@ -77,7 +102,7 @@ int main(int argc, char const *argv[])
 		return -3;
 	}
 
-	bool (*funciones[5])(const char *,
+	bool (*funciones[])(const char *,
 			     void *) = { agregar_nombre, agregar_tipo,
 					 agregar_numero, agregar_numero,
 					 agregar_numero };
@@ -87,41 +112,31 @@ int main(int argc, char const *argv[])
 	int fuerza;
 	int destreza;
 	int resistencia;
-	void *punteros[CANT_COLUMNAS] = { &nombre, &tipo, &fuerza, &destreza,
+	void *punteros[] = { &nombre, &tipo, &fuerza, &destreza,
 					  &resistencia };
-
+	struct pokemon pokemon;
 	while (leer_linea_csv(archivo, CANT_COLUMNAS, funciones, punteros) ==
 	       CANT_COLUMNAS) {
-		struct pokemon pokemon;
 		pokemon.nombre = malloc((strlen(nombre) + 1) * sizeof(char));
 		if (!pokemon.nombre) {
 			printf("Pokemon %s no pudo ser asignado a la pokedex, problema con asignar memoria",
 			       nombre);
 		} else {
-			strcpy(pokemon.nombre, nombre);
-			pokemon.tipo = tipo;
-			pokemon.fuerza = fuerza;
-			pokemon.destreza = destreza;
-			pokemon.resistencia = resistencia;
+			procesar_informacion_pokemon(&pokemon, nombre, tipo, fuerza, destreza, resistencia);
 			pokedex_agregar_pokemon(pokedex, pokemon);
 			free(pokemon.nombre);
 			free(nombre);
 		}
 	};
 
-	const char *tipos_pokemon[CANT_TIPOS] = { "Agua",      "Fuego",
-						  "Planta",    "Rroca",
-						  "Electrico", "Normal",
-						  "Lucha" };
-	int contador_tipos[CANT_TIPOS] = { 0, 0, 0, 0, 0, 0, 0 };
-
-	pokedex_iterar_pokemones(pokedex, mostrar_pokemons, NULL);
-	pokedex_iterar_pokemones(pokedex, contar_tipos, contador_tipos);
+	struct tipos_pokemon tipos_totales = inicializar_tipos();
+	
+	pokedex_iterar_pokemones(pokedex, mostrar_pokemones_y_contar_tipos, &tipos_totales);
 
 	printf("Cantidad de pokemones de cada tipo:\n");
 
 	for (int i = 0; i < CANT_TIPOS; i++) {
-		printf("%s: %d\n", tipos_pokemon[i], contador_tipos[i]);
+		printf("%s: %ld\n", tipos_totales.tipos[i], tipos_totales.vector_tipos_cantidades[i]);
 	}
 
 	finalizar_programa(pokedex, archivo);
