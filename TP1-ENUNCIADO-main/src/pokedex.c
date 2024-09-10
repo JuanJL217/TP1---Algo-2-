@@ -52,7 +52,6 @@ bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon)
 		return false;
 	}
 
-	size_t posicion_del_pokemon = 0;
 	char* nueva_ubicacion_nombre = malloc(strlen(pokemon.nombre)+1 * sizeof(char));
 	if (!nueva_ubicacion_nombre) {
 		return false;
@@ -60,12 +59,11 @@ bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon)
 	strcpy(nueva_ubicacion_nombre, pokemon.nombre);
 	pokemon.nombre = nueva_ubicacion_nombre;
 
-	if (pokedex->cantidad_pokemones > 0) {
-		posicion_del_pokemon = pokedex_iterar_pokemones(pokedex, buscar_posicion, pokemon.nombre);
 
-		for (size_t i = pokedex->cantidad_pokemones; i > posicion_del_pokemon; i--) {
-			pokedex->vector_pokemones[i] = pokedex->vector_pokemones[i - 1];
-		}
+	size_t posicion_del_pokemon = pokedex_iterar_pokemones(pokedex, buscar_posicion, pokemon.nombre);
+
+	for (size_t i = pokedex->cantidad_pokemones; i > posicion_del_pokemon; i--) {
+		pokedex->vector_pokemones[i] = pokedex->vector_pokemones[i - 1];
 	}
 
 	pokedex->vector_pokemones[posicion_del_pokemon] = pokemon;
@@ -114,11 +112,14 @@ size_t pokedex_iterar_pokemones(struct pokedex *pokedex,
 
 void pokedex_destruir(struct pokedex *pokedex)
 {
-	if (pokedex) {
-		for (size_t i = 0; i < pokedex->cantidad_pokemones; i++) {
-			free(pokedex->vector_pokemones[i].nombre);
-		}
-		free(pokedex->vector_pokemones);
-		free(pokedex);
-	}
+    if (pokedex) {
+        if (pokedex->vector_pokemones) {
+            for (size_t i = 0; i < pokedex->cantidad_pokemones; i++) {
+                free(pokedex->vector_pokemones[i].nombre);
+            }
+            free(pokedex->vector_pokemones);
+        }
+        free(pokedex);
+    }
 }
+

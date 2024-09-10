@@ -1,9 +1,9 @@
 #include "csv.h"
 #include <stdio.h>
 #include <string.h>
-#include "lectura_separador/split.h"
+#include "split.h"
 
-#define CANT_LETRAS 50
+#define CANT_CARACTERES 100
 
 struct archivo_csv {
 	FILE* archivo;
@@ -37,9 +37,9 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 	}
 
 	size_t columna_posicion = 0;
-	char texto[CANT_LETRAS];
+	char texto[CANT_CARACTERES];
 
-	if (!fgets(texto, CANT_LETRAS, archivo->archivo)){
+	if (!fgets(texto, CANT_CARACTERES, archivo->archivo)){
 		return columna_posicion;
 	}
 

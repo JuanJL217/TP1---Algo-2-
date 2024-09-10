@@ -1,7 +1,7 @@
 #include "pa2m.h"
 #include "src/csv.h"
 #include "src/pokedex.h"
-#include "string.h"
+#include <string.h>
 
 bool leer_int(const char *str, void *ctx)
 {

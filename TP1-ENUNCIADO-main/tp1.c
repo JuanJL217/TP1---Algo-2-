@@ -81,7 +81,7 @@ int main(int argc, char const *argv[])
 			     void *) = { agregar_nombre, agregar_tipo,
 					 agregar_numero, agregar_numero,
 					 agregar_numero };
-
+	
 	char *nombre = NULL;
 	char tipo;
 	int fuerza;
@@ -90,10 +90,9 @@ int main(int argc, char const *argv[])
 	void *punteros[CANT_COLUMNAS] = { &nombre, &tipo, &fuerza, &destreza,
 					  &resistencia };
 
-	struct pokemon pokemon;
-
 	while (leer_linea_csv(archivo, CANT_COLUMNAS, funciones, punteros) ==
 	       CANT_COLUMNAS) {
+		struct pokemon pokemon;
 		pokemon.nombre = malloc((strlen(nombre) + 1) * sizeof(char));
 		if (!pokemon.nombre) {
 			printf("Pokemon %s no pudo ser asignado a la pokedex, problema con asignar memoria",
