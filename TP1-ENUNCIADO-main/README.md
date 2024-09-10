@@ -11,7 +11,7 @@
 - Para compilar:
 
 ```bash
-gcc -g tp1.c src/csv.c src/pokedex.c -o tp1
+gcc -g tp1.c src/csv.c src/pokedex.c lectura_separador/split.c -o tp1
 ```
 
 - Para ejecutar:

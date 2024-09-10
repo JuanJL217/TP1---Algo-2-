@@ -1,7 +1,7 @@
 #include "csv.h"
 #include <stdio.h>
 #include <string.h>
-#include "lectura_separador/split.c"
+#include "lectura_separador/split.h"
 
 #define CANT_LETRAS 50
 
@@ -37,20 +37,16 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 	}
 
 	size_t columna_posicion = 0;
-	char* texto = malloc(CANT_LETRAS * sizeof(char));
+	char texto[CANT_LETRAS];
 
 	if (!fgets(texto, CANT_LETRAS, archivo->archivo)){
-		free(texto);
 		return columna_posicion;
 	}
 
 	struct Partes* partes = dividir_string(texto, archivo->separador);
 	if (!partes) {
-		free(texto);
 		return columna_posicion;
 	}
-
-	free(texto);
 
 	while (columna_posicion < columnas) {
 		if (!funciones[columna_posicion](partes->string[columna_posicion], ctx[columna_posicion])){
