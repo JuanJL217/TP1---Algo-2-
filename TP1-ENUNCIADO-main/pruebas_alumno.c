@@ -64,7 +64,7 @@ void abrirArchivoYParsearLosNombres()
 	const char *resultado_esperado[6] = { "Pikachu",  "Charmander",
 					      "Larvitar", "Cacnea",
 					      "Togepi",	  "Floatzel" };
-	printf("Se mota en consideración la primera columna para ver si hay errores al toman n columnas de m\n");
+	printf("Se toma en consideración la primera columna para ver si hay errores al toman n columnas de m\n");
 	int cantidad_total = 0;
 	char *nombre = NULL;
 	char *nombres[6];
@@ -76,7 +76,7 @@ void abrirArchivoYParsearLosNombres()
 		nombres[posicion] = malloc((strlen(nombre) + 1) * sizeof(char));
 		if (!nombres[posicion]) {
 			for (int i = 0; i < posicion; i++) {
-				free(nombres[posicion]);
+				free(nombres[i]);
 			}
 			cerrar_archivo_csv(archivo);
 			return;
@@ -161,8 +161,8 @@ void agregarVariosPokemones()
 	pokedex_destruir(pokedex);
 }
 
-void agregaDosPokemonesConIgualNombre() {
-	
+void agregaDosPokemonesConIgualNombre()
+{
 }
 
 int main()

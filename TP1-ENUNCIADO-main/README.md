@@ -17,8 +17,6 @@ gcc -g tp1.c src/csv.c src/pokedex.c src/split.c -o tp1
 - Para ejecutar:
 
 ```bash
-./tp1 <archivo pasado por teclado>
-por ejemplo:
 ./tp1 ejemplos/pokedex.csv
 ```
 
