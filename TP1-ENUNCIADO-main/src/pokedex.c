@@ -30,7 +30,7 @@ bool buscar_pokemon(struct pokemon *pokemon_actual,
 		    void *nombre_pokemon_a_buscar)
 {
 	return strcmp(pokemon_actual->nombre,
-		      (const char *)nombre_pokemon_a_buscar) == 0;
+		      (const char *)nombre_pokemon_a_buscar) != 0;
 }
 
 //*********** FUNCIONES PRINCIPALES **********
@@ -51,14 +51,13 @@ bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon)
 	if (!pokedex || !pokemon.nombre) {
 		return false;
 	}
-
+	
 	char *nueva_ubicacion_nombre =
 		malloc((strlen(pokemon.nombre) + 1) * sizeof(char));
 	if (!nueva_ubicacion_nombre) {
 		return false;
 	}
-
-	// si es que no está el nombre en la pokedex
+	
 	strcpy(nueva_ubicacion_nombre, pokemon.nombre);
 	pokemon.nombre = nueva_ubicacion_nombre;
 
