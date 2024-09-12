@@ -42,17 +42,17 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 
 ### Estructura para la lectura de archivo 
 
-En el archivo `sarasa.c` la función `funcion1` utiliza `realloc` para agrandar la zona de memoria utilizada para conquistar el mundo. El resultado de `realloc` lo guardo en una variable auxiliar para no perder el puntero original en caso de error:
+En el archivo `csv.c` la función `abrir_archivo_csv` inicializo la estructura `struct archivo_csv` con la cual tendre la direcion
+de memoria del archivo, dicha dirección estará alojada en el heap, debido a que la funcion `malloc()` me da un bloque de memoria
+en el heap, para su uso dinamico. Si hay un error en asignar memoria, retorno NULL
 
 ```c
-int *vector = realloc(vector_original, (n+1)*sizeof(int));
-
-if(vector == NULL)
-    return -1;
-vector_original = vector;
+struct archivo_csv *archivo_csv = malloc(sizeof(struct archivo_csv));
+if (!archivo_csv) {
+	fclose(archivo);
+	return NULL;
+}
 ```
-
-
 <div align="center">
 <img width="70%" src="img/diagrama2.svg">
 </div>
