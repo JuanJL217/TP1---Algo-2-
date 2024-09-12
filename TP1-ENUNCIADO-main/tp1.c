@@ -108,8 +108,8 @@ int main(int argc, char const *argv[])
 	void *punteros[] = { &pokemon.nombre, &pokemon.tipo, &pokemon.fuerza,
 			     &pokemon.destreza, &pokemon.resistencia };
 
-	while (leer_linea_csv(archivo_tp1, CANT_COLUMNAS, funciones, punteros) ==
-	       CANT_COLUMNAS) {
+	while (leer_linea_csv(archivo_tp1, CANT_COLUMNAS, funciones,
+			      punteros) == CANT_COLUMNAS) {
 		if (!pokedex_agregar_pokemon(pokedex, pokemon)) {
 			fprintf(stderr,
 				"Pokemon %s no pudo ser asignado a la pokedex, problema con la funcion agregar pokemon\n",

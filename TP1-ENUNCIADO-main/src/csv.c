@@ -3,30 +3,43 @@
 #include <string.h>
 #include "split.h"
 
-#define CANT_CARACTERES 100
+const size_t CAPACIDAD_INICIAL_CSV = 12;
+const size_t FACTOR_CRECIMIENTO_LINEA = 2;
 
 struct archivo_csv {
 	FILE *archivo;
 	char separador;
 };
 
+bool redimencionar_linea_texto(char **texto, size_t *capacidad)
+{
+	*capacidad *= FACTOR_CRECIMIENTO_LINEA;
+	char *nuevo_bloque_texto = realloc(*texto, (*capacidad) * sizeof(char));
+	if (!nuevo_bloque_texto) {
+		return false;
+	}
+	*texto = nuevo_bloque_texto;
+	return true;
+}
+
 struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
 				      char separador)
 {
+	struct archivo_csv *inicializar_archivo =
+		malloc(sizeof(struct archivo_csv));
+	if (!inicializar_archivo) {
+		return NULL;
+	}
+
 	FILE *archivo = fopen(nombre_archivo, "r");
 	if (!archivo) {
+		free(inicializar_archivo);
 		return NULL;
 	}
 
-	struct archivo_csv *archivo_csv = malloc(sizeof(struct archivo_csv));
-	if (!archivo_csv) {
-		fclose(archivo);
-		return NULL;
-	}
-
-	archivo_csv->archivo = archivo;
-	archivo_csv->separador = separador;
-	return archivo_csv;
+	inicializar_archivo->archivo = archivo;
+	inicializar_archivo->separador = separador;
+	return inicializar_archivo;
 }
 
 size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
@@ -37,32 +50,63 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 	}
 
 	size_t columna_posicion = 0;
-	char texto[CANT_CARACTERES];
 
-	if (!fgets(texto, CANT_CARACTERES, archivo->archivo)) {
+	size_t capacidad_linea = CAPACIDAD_INICIAL_CSV;
+	size_t tamaño_del_texto = 0;
+	char *texto = malloc(capacidad_linea * sizeof(char));
+	if (!texto) {
 		return columna_posicion;
 	}
 
+	int valor_ascii;
+
+	while ((valor_ascii = fgetc(archivo->archivo)) != EOF &&
+	       valor_ascii != '\n') {
+		if (tamaño_del_texto >= (capacidad_linea * 75) / 100) {
+			if (!redimencionar_linea_texto(&texto,
+						       &capacidad_linea)) {
+				free(texto);
+				return columna_posicion;
+			}
+		}
+		texto[tamaño_del_texto++] = (char)valor_ascii;
+	}
+
+	if (tamaño_del_texto == 0 && valor_ascii == EOF) {
+		free(texto);
+		return columna_posicion;
+	}
+
+	texto[tamaño_del_texto] = '\0';
 	struct Partes *partes = dividir_string(texto, archivo->separador);
-	if (!partes || partes->cantidad < columnas) {
+	free(texto);
+
+	if (!partes) {
 		return columna_posicion;
 	}
 
-	if (partes->cantidad == 0) {
+	if (partes->cantidad == 0 || partes->cantidad < columnas) {
 		liberar_partes(partes);
 		return columna_posicion;
 	}
 
 	while (columna_posicion < columnas) {
+		if (!funciones[columna_posicion]) {
+			liberar_partes(partes);
+			return columna_posicion;
+		}
+
 		if (!funciones[columna_posicion](
 			    partes->string[columna_posicion],
 			    ctx[columna_posicion])) {
-			break;
+			liberar_partes(partes);
+			return columna_posicion + 1;
 		}
 		columna_posicion++;
 	}
+
 	liberar_partes(partes);
-	return columna_posicion;
+	return columnas;
 }
 
 void cerrar_archivo_csv(struct archivo_csv *archivo)

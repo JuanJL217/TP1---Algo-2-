@@ -42,6 +42,9 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 
 ### Estructura para la lectura de archivo
 
+Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria al heap de manera dinamica, lo cual es O(1), por lo que si pido, tengo que liberar luego con un `free()`. 
+
+### `abrir_archivo_csv` O(1)
 En el archivo `csv.c` la función `abrir_archivo_csv` iinicializa la estructura `struct archivo_csv` y devuelvo su puntero. Esta estructura inicializada, se almacena en el heap, en un bloque de memoria de manera dinamica debido al uso de `malloc()`. 
 En resumen, cuando inicializo una varible de tipo `struct archivo_csv*`con la funcion `abrir_archivo_csv` retorno un puntero a la estructura almacenada en el heap, que dicha estructura, guarda un puntero, también en el heap, de tipo FILE*, donde se encuentra almacenado el archivo.
 
@@ -53,6 +56,3 @@ struct archivo_csv *archivo_tp1 = abrir_archivo_csv(argv[1], ';');
 </div>
 
 ---
-
-## Respuestas a las preguntas teóricas
-Incluír acá las respuestas a las preguntas del enunciado (si aplica).
