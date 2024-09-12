@@ -1,16 +1,20 @@
 #include "pokedex.h"
 #include <string.h>
 
+const size_t CAPACIDAD_INICAL = 6;
+const size_t FACTOR_CRECIMIENTO = 2;
+
 struct pokedex {
 	struct pokemon *vector_pokemones;
 	size_t cantidad_pokemones;
+	size_t capacidad;
 };
 
 //********* FUNCIONES EXRAS ***********
 
 bool redimensionar_vector_pokemones(struct pokedex *pokedex)
 {
-	size_t nueva_capacidad = pokedex->cantidad_pokemones + 1;
+	size_t nueva_capacidad = pokedex->capacidad * FACTOR_CRECIMIENTO;
 	struct pokemon *nuevo_bloque =
 		realloc(pokedex->vector_pokemones,
 			nueva_capacidad * sizeof(struct pokemon));
@@ -41,8 +45,13 @@ struct pokedex *pokedex_crear()
 	if (!inicializar_pokedex) {
 		return NULL;
 	}
-	inicializar_pokedex->vector_pokemones = NULL;
 	inicializar_pokedex->cantidad_pokemones = 0;
+	inicializar_pokedex->capacidad = CAPACIDAD_INICAL;
+	inicializar_pokedex->vector_pokemones = malloc(CAPACIDAD_INICAL * sizeof(struct pokemon));
+	if (!inicializar_pokedex->vector_pokemones) {
+		free(inicializar_pokedex);
+		return NULL;
+	}
 	return inicializar_pokedex;
 }
 
@@ -70,8 +79,10 @@ bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon)
 		    0) {
 		free(pokedex->vector_pokemones[posicion_del_pokemon].nombre);
 	} else {
-		if (!redimensionar_vector_pokemones(pokedex)) {
-			return false;
+		if (pokedex->cantidad_pokemones >= (pokedex->capacidad * 75 / 100)) {
+			if(!redimensionar_vector_pokemones(pokedex)) {
+				return false;
+			}
 		}
 		for (size_t i = pokedex->cantidad_pokemones;
 		     i > posicion_del_pokemon; i--) {
