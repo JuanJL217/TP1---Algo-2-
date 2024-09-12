@@ -83,15 +83,15 @@ int main(int argc, char const *argv[])
 		return -1;
 	}
 
-	struct archivo_csv *archivo = abrir_archivo_csv(argv[1], ';');
-	if (!archivo) {
+	struct archivo_csv *archivo_tp1 = abrir_archivo_csv(argv[1], ';');
+	if (!archivo_tp1) {
 		perror("No se pudo inicializar el archivo\n");
 		return -2;
 	}
 
 	struct pokedex *pokedex = pokedex_crear();
 	if (!pokedex) {
-		cerrar_archivo_csv(archivo);
+		cerrar_archivo_csv(archivo_tp1);
 		perror("No se pudo inicializar la pokedex\n");
 		return -3;
 	}
@@ -108,7 +108,7 @@ int main(int argc, char const *argv[])
 	void *punteros[] = { &pokemon.nombre, &pokemon.tipo, &pokemon.fuerza,
 			     &pokemon.destreza, &pokemon.resistencia };
 
-	while (leer_linea_csv(archivo, CANT_COLUMNAS, funciones, punteros) ==
+	while (leer_linea_csv(archivo_tp1, CANT_COLUMNAS, funciones, punteros) ==
 	       CANT_COLUMNAS) {
 		if (!pokedex_agregar_pokemon(pokedex, pokemon)) {
 			fprintf(stderr,
@@ -118,7 +118,7 @@ int main(int argc, char const *argv[])
 		free(pokemon.nombre);
 		lineas_leidas++;
 	};
-	cerrar_archivo_csv(archivo);
+	cerrar_archivo_csv(archivo_tp1);
 
 	if (lineas_leidas == VACIO) {
 		fprintf(stderr, "Archivo Vacio\n");

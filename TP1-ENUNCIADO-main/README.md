@@ -40,21 +40,16 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 
 ## Estructuras
 
-### Estructura para la lectura de archivo 
+### Estructura para la lectura de archivo
 
-En el archivo `csv.c` la función `abrir_archivo_csv` inicializo la estructura `struct archivo_csv` con la cual tendre la direcion
-de memoria del archivo, dicha dirección estará alojada en el heap, debido a que la funcion `malloc()` me da un bloque de memoria
-en el heap, para su uso dinamico. Si hay un error en asignar memoria, retorno NULL
+En el archivo `csv.c` la función `abrir_archivo_csv` iinicializa la estructura `struct archivo_csv` y devuelvo su puntero. Esta estructura inicializada, se almacena en el heap, en un bloque de memoria de manera dinamica debido al uso de `malloc()`. 
+En resumen, cuando inicializo una varible de tipo `struct archivo_csv*`con la funcion `abrir_archivo_csv` retorno un puntero a la estructura almacenada en el heap, que dicha estructura, guarda un puntero, también en el heap, de tipo FILE*, donde se encuentra almacenado el archivo.
 
 ```c
-struct archivo_csv *archivo_csv = malloc(sizeof(struct archivo_csv));
-if (!archivo_csv) {
-	fclose(archivo);
-	return NULL;
-}
+struct archivo_csv *archivo_tp1 = abrir_archivo_csv(argv[1], ';');
 ```
 <div align="center">
-<img width="70%" src="img/diagrama2.svg">
+<img width="70%" src="img/abrir_archivo_csv.png">
 </div>
 
 ---
