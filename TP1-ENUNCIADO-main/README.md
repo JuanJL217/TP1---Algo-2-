@@ -29,19 +29,18 @@ valgrind ./tp1 ejemplos/pokedex.csv
 
 ##  Funcionamiento
 
-Explicación de cómo funcionan las estructuras desarrolladas en el TP y el funcionamiento general del mismo.
+Para la implementación de este TP nos piden leer un archivo como argumento de un programa compilado.
+Tendrémos 2 estructuras, para la lectura de archivo y para almacenar elemento, en este caso, pokemones.
 
-Aclarar en esta parte todas las decisiones que se tomaron al realizar el TP, cosas que no se aclaren en el enunciado, fragmentos de código que necesiten explicación extra, etc.
-
-Incluír **EN TODOS LOS TPS** los diagramas relevantes al problema (mayormente diagramas de memoria para explicar las estructuras, pero se pueden utilizar otros diagramas si es necesario).
-
-### Por ejemplo:
-
-El programa funciona abriendo el archivo pasado como parámetro y leyendolo línea por línea. Por cada línea crea un registro e intenta agregarlo al vector. La función de lectura intenta leer todo el archivo o hasta encontrar el primer error. Devuelve un vector con todos los registros creados.
+Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos piden.
 
 <div align="center">
 <img width="70%" src="img/flujo_tp1.png">
 </div>
+
+## Estructuras
+
+### Estructura para la lectura de archivo 
 
 En el archivo `sarasa.c` la función `funcion1` utiliza `realloc` para agrandar la zona de memoria utilizada para conquistar el mundo. El resultado de `realloc` lo guardo en una variable auxiliar para no perder el puntero original en caso de error:
 
