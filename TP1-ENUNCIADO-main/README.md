@@ -65,7 +65,7 @@ struct archivo_csv *archivo_tp1 = abrir_archivo_csv(argv[1], ';');
 
 ---
 
-## `leer_linea_csv` O(c² + m)
+## `leer_linea_csv` O(c² + m*c)
 
 En primer lugar, dentro de la función, como no sabemos cuantos caracteres van a ser, y no queremos tener un limite de caracteres,vamos a crear una variable `char* texto` de forma dinamica, donde almacenaremos la cadena de caracteres de una linea del archivo (de manera local dentro d ela función). Esta parte de la función se ejecuta `c` veces. De esta manera tenermos la linea de texto en una varible. En el peor de los casos, vamos a tener que redimencionar ese vector `k` veces, el costo de usar `realloc()` es `O(c)`, porque estamos pasando los caracteres del anterior bloque, esto hace que el ciclo quede: `n(O(k*c))`, pero como sabemos que `k` va a ser más chico que `c` a medida que vayan entrando más caracteres, nos queda `c(O(c))` => `O(c²)` (1).
 ```c
@@ -94,17 +94,18 @@ De ahí entramos en un ciclo while, la cual va a estar usando puntero a funcione
 
 Mencionar que, hacer free(partes), nos cuesta `O(m)` (4), ya que, en el peor de los casos, vamos a liberar cada columna que usamos.
 
+```c
+		for (int i = 0; i < partes->cantidad; ++i) {
+			free(partes->string[i]);
+		}
+```
+
 Entonces nos quedaria en total que la función queda como `O(c²)`(1) + `O(c²)`(2) + `O(m*c)`(3) + `O(m)`(4) => `O(c² + m*c + m)`, pero `m*c` > `m`, ya que, el peor de los casos haya 1000 columnas y dentro de cada columna, 1000 caracteres, viendo de esa manera `1000*1000 > 1000`, entonces nos quedamos con: `O(c² + m*c)`, ahora bien, ¿Cuál es más significativo entre esas 2 sumas? Lo mejor es dejarlo de esta manera, así la complejidad está dependiende de columnas y caracteres.
 
 ## `cerrar_archivo_csv` O(m)
 
 Cuando cerramos el archivo, tambien liberamos memoria, y vamos a liberar m veces, porque tendremos m partes (columnas), así que la función queda `O(m)`.
 
-```c
-		for (int i = 0; i < partes->cantidad; ++i) { // O(m)
-			free(partes->string[i]);
-		}
-```
 
 # pokedex.c
 
