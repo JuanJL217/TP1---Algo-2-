@@ -75,14 +75,15 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 		texto[tamaño_del_texto++] = (char)valor_ascii;
 	} // ====> O(c²)
 
+	texto[tamaño_del_texto] = '\0';
+
 	if (tamaño_del_texto == 0 && valor_ascii == EOF) {
 		free(texto);
 		return columna_posicion;
 	}
 
-	texto[tamaño_del_texto] = '\0';
 	struct Partes *partes =
-		dividir_string(texto, archivo->separador); // O(c)
+		dividir_string(texto, archivo->separador); // O(c²)
 	free(texto);
 
 	if (!partes) {
@@ -102,14 +103,14 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 
 		if (!funciones[columna_posicion](
 			    partes->string[columna_posicion],
-			    ctx[columna_posicion])) { // alguna funcion puede hacer strcpy -> o(c)
+			    ctx[columna_posicion])) { // o(c)
 			liberar_partes(partes);
 			return columna_posicion + 1;
 		}
 		columna_posicion++;
 	} // ===> O(m*c)
 
-	liberar_partes(partes);
+	liberar_partes(partes); //O(m)
 	return columnas;
 }
 
