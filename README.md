@@ -92,7 +92,7 @@ De ahí entramos en un ciclo while, la cual va a estar usando puntero a funcione
 			liberar_partes(partes);
 ```
 
-Mencionar que, hacer free(partes), nos cuesta `O(m)` (4), ya que, en el peor de los casos, vamos a liberar cada columna que usamos.
+Mencionar que, hacer free(partes), nos cuesta `O(m)` (4), ya que vamos a liberar cada columna que tengamos almacenado.
 
 ```c
 		for (int i = 0; i < partes->cantidad; ++i) {
@@ -104,7 +104,7 @@ Entonces nos quedaria en total que la función queda como `O(c²)`(1) + `O(c²)`
 
 ## `cerrar_archivo_csv` O(m)
 
-Cuando cerramos el archivo, tambien liberamos memoria, y vamos a liberar m veces, porque tendremos m partes (columnas), así que la función queda `O(m)`.
+Cerraremos el archivo que abrimos desde un comienzo, y liberaremos la memoria que pedimos al inicializar nuestra estructura.
 
 
 # pokedex.c

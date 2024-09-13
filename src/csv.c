@@ -103,7 +103,7 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 
 		if (!funciones[columna_posicion](
 			    partes->string[columna_posicion],
-			    ctx[columna_posicion])) { // o(c)
+			    ctx[columna_posicion])) { //  o(c)
 			liberar_partes(partes);
 			return columna_posicion + 1;
 		}
