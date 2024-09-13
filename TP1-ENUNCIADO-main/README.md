@@ -42,9 +42,13 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 
 ### Estructura para la lectura de archivo
 
-Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria al heap de manera dinamica, lo cual es O(1), por lo que si pido, tengo que liberar luego con un `free()`, que tambien es O(1)`. 
+Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria al heap de manera dinamica, lo cual es O(1), por lo que si pido, tengo que liberar usando `free()`.
+Nota: inicializar\declarar una variable, if, break, operadores matematico son `O(1)`.
 
 ## csv.c
+
+### c = cantidad de caracteres
+### m = cantidad de columnas
 
 ### `abrir_archivo_csv` O(1)
 Inicializa la estructura `struct archivo_csv` y devuelvo su dirección de memoria. Esta estructura inicializada, está ubicada en el heap, en un bloque de memoria de manera dinamica debido al uso de `malloc()`. 
@@ -60,8 +64,8 @@ struct archivo_csv *archivo_tp1 = abrir_archivo_csv(argv[1], ';');
 
 ---
 
-### `leer_linea_csv` O(c) + O(m)
-En primer lugar, dentro de la función, como no sabemos cuantos caracteres van a ser, y no queremos tener un limite de caracteres,vamos a crear una variable `char* texto` de forma dinamica con `malloc()`, donde almacenaremos la cadena de caracteres de cada linea del archivo. esta parte de la función es `O(c)`, siendo `c` la cantidad de caracteres en la linea de texto. De esta manera tenermos la linea de texto en una varible.
+### `leer_linea_csv` O(c² + m)
+En primer lugar, dentro de la función, como no sabemos cuantos caracteres van a ser, y no queremos tener un limite de caracteres,vamos a crear una variable `char* texto` de forma dinamica con `malloc()`, donde almacenaremos la cadena de caracteres de cada linea del archivo. esta parte de la función es `O(c)`, siendo `c` la cantidad de caracteres en la linea de texto. De esta manera tenermos la linea de texto en una varible. En el peor de los casos, vamos a tener que redimencionar ese vector `k`veces, el costo de usar `realloc()` es `O(c)`, porque estamos creando un nuevo bloque, con mayor capacidad, donde copiamos los caracteres del anterior bloque, esto hace que el ciclo quede: `O(c * k*O(c))`, lo cual es O(c²)
 
 ```c
 	while ((valor_ascii = fgetc(archivo->archivo)) != EOF &&
@@ -71,10 +75,6 @@ En primer lugar, dentro de la función, como no sabemos cuantos caracteres van a
 						       &capacidad_linea)) {
 				free(texto);
 				return columna_posicion;
-			}
-		}
-		texto[tamaño_del_texto++] = (char)valor_ascii;
-	}
 ```
 
 En la funcion de `dividir_partes`, sin entrar en tantos detalles, va a iterar la linea de texto que guardamos y separar palabra por palabra cuando haya una separador presente, lo cual, lo hace tambien `O(c)`;
@@ -85,4 +85,9 @@ struct Partes *partes = dividir_string(texto, archivo->separador);
 
 De ahí entramos en un ciclo while, la cual va a estar usando puntero a funciones y punteros a void, esta parte de la función. Al ser un ciclo que dependa de que sea menor que columna, y siendo columna una variable que puede ser cualquier valor, decimos que el ciclo while es `O(m)`, siendo `m` la cantidad de columnas que tiene cada texto (cada columna es definido por el separador). Si salimos del ciclo while por su condición, sabemos que iteró todas las columnas, por eso al final hay un `return columas`. Si en alguna función es NULL e iba en la tercera iteracion, decimos que itero solo 2 veces, pero si en la tercera iteracion dio falso, decimos que iteró 3 veces. Dentro del cilo, va a haber funciones, pero como está destinado al parseo de datos, decimos que adentro del ciclo es `O(1)`.
 
-Entonces noes quedaria en total que la función queda como `O(c) + O(m)`;
+Entonces noes quedaria en total que la función queda como `O(c²) + O(c) + O(m)`, lo cual queda como O(c² + m);
+
+### `cerrar_archivo_csv` O(m)
+
+Como pedimos memoria por medio de lo `malloc()`, es nuestro deber tener que liberarla, para que no haya fugas de memoria.
+Así como liberarmos memoria en al función anterior, fue memoria que se utilizó en ese momento, pero también hay memoria que pedimos y que seguirá usandose mientras no lo liberemos, como es el caso de inicializar la estructura en `abrir_archivo_csv()`, y tambien cerrar el archivo que aun tenemos ligado. Como `free()` y `fclose()` son `O(1)`, entonces la función es `O(1)`.
