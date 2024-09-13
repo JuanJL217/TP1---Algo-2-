@@ -11,10 +11,11 @@ struct archivo_csv {
 	char separador;
 };
 
-bool redimencionar_linea_texto(char **texto, size_t *capacidad)
+bool redimencionar_linea_texto(char **texto, size_t *capacidad) // ====> O(c)
 {
 	*capacidad *= FACTOR_CRECIMIENTO_LINEA;
-	char *nuevo_bloque_texto = realloc(*texto, (*capacidad) * sizeof(char));
+	char *nuevo_bloque_texto =
+		realloc(*texto, (*capacidad) * sizeof(char)); // O(c)
 	if (!nuevo_bloque_texto) {
 		return false;
 	}
@@ -23,7 +24,7 @@ bool redimencionar_linea_texto(char **texto, size_t *capacidad)
 }
 
 struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
-				      char separador)
+				      char separador) //  =====> O(1)
 {
 	struct archivo_csv *inicializar_archivo =
 		malloc(sizeof(struct archivo_csv));
@@ -43,7 +44,8 @@ struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
 }
 
 size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
-		      bool (*funciones[])(const char *, void *), void *ctx[])
+		      bool (*funciones[])(const char *, void *),
+		      void *ctx[]) // =====> O(c² + m*c)
 {
 	if (!archivo || !archivo->archivo || !funciones || !ctx) {
 		return 0;
@@ -61,16 +63,17 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 	int valor_ascii;
 
 	while ((valor_ascii = fgetc(archivo->archivo)) != EOF &&
-	       valor_ascii != '\n') {
+	       valor_ascii != '\n') { // c veces
 		if (tamaño_del_texto >= (capacidad_linea * 75) / 100) {
-			if (!redimencionar_linea_texto(&texto,
-						       &capacidad_linea)) {
+			if (!redimencionar_linea_texto(
+				    &texto,
+				    &capacidad_linea)) { // O(c)
 				free(texto);
 				return columna_posicion;
 			}
 		}
 		texto[tamaño_del_texto++] = (char)valor_ascii;
-	}
+	} // ====> O(c²)
 
 	if (tamaño_del_texto == 0 && valor_ascii == EOF) {
 		free(texto);
@@ -78,7 +81,8 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 	}
 
 	texto[tamaño_del_texto] = '\0';
-	struct Partes *partes = dividir_string(texto, archivo->separador);
+	struct Partes *partes =
+		dividir_string(texto, archivo->separador); // O(c)
 	free(texto);
 
 	if (!partes) {
@@ -90,7 +94,7 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 		return columna_posicion;
 	}
 
-	while (columna_posicion < columnas) {
+	while (columna_posicion < columnas) { // m veces
 		if (!funciones[columna_posicion]) {
 			liberar_partes(partes);
 			return columna_posicion;
@@ -98,18 +102,18 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 
 		if (!funciones[columna_posicion](
 			    partes->string[columna_posicion],
-			    ctx[columna_posicion])) {
+			    ctx[columna_posicion])) { // alguna funcion puede hacer strcpy -> o(c)
 			liberar_partes(partes);
 			return columna_posicion + 1;
 		}
 		columna_posicion++;
-	}
+	} // ===> O(m*c)
 
 	liberar_partes(partes);
 	return columnas;
 }
 
-void cerrar_archivo_csv(struct archivo_csv *archivo)
+void cerrar_archivo_csv(struct archivo_csv *archivo) // =====> O(1)
 {
 	if (archivo) {
 		if (archivo->archivo) {

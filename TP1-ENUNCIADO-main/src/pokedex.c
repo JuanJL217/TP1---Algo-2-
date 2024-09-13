@@ -76,55 +76,44 @@ bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon)
 		return false;
 	}
 
-	strcpy(nueva_ubicacion_nombre, pokemon.nombre);
+	strcpy(nueva_ubicacion_nombre, pokemon.nombre); // O(n)
 	pokemon.nombre = nueva_ubicacion_nombre;
 
-	size_t posicion_del_pokemon = pokedex_iterar_pokemones(
-		pokedex, buscar_posicion, pokemon.nombre);
+	size_t pokemones_iterados = pokedex_iterar_pokemones(
+		pokedex, buscar_posicion, pokemon.nombre); // O(n)
 
-	if (pokedex->cantidad_pokemones == 0) {
-		pokedex->vector_pokemones[posicion_del_pokemon] = pokemon;
+	if (pokemones_iterados == 0) {
+		pokedex->vector_pokemones[pokemones_iterados] = pokemon;
 		pokedex->cantidad_pokemones++;
 		return true;
 	}
 
-	if (posicion_del_pokemon == pokedex->cantidad_pokemones) {
-		if (strcmp(pokedex->vector_pokemones[posicion_del_pokemon - 1]
+	if (pokemones_iterados == pokedex->cantidad_pokemones) {
+		if (strcmp(pokedex->vector_pokemones[pokemones_iterados - 1]
 				   .nombre,
 			   pokemon.nombre) < 0) {
-			pokedex->vector_pokemones[posicion_del_pokemon] =
-				pokemon;
+			pokedex->vector_pokemones[pokemones_iterados] = pokemon;
 		} else {
-			pokedex->vector_pokemones[posicion_del_pokemon] =
-				pokedex->vector_pokemones[posicion_del_pokemon -
+			pokedex->vector_pokemones[pokemones_iterados] =
+				pokedex->vector_pokemones[pokemones_iterados -
 							  1];
-			pokedex->vector_pokemones[posicion_del_pokemon - 1] =
+			pokedex->vector_pokemones[pokemones_iterados - 1] =
 				pokemon;
 		}
 	} else {
-		if (posicion_del_pokemon == 1) {
-			for (size_t i = pokedex->cantidad_pokemones; i > 0;
-			     i--) {
-				pokedex->vector_pokemones[i] =
-					pokedex->vector_pokemones[i - 1];
-			}
-			pokedex->vector_pokemones[0] = pokemon;
-		} else {
-			for (size_t i = pokedex->cantidad_pokemones;
-			     i >= posicion_del_pokemon; i--) {
-				pokedex->vector_pokemones[i] =
-					pokedex->vector_pokemones[i - 1];
-			}
-			pokedex->vector_pokemones[posicion_del_pokemon - 1] =
-				pokemon;
+		for (size_t i = pokedex->cantidad_pokemones;
+		     i > pokemones_iterados - 1; i--) {
+			pokedex->vector_pokemones[i] =
+				pokedex->vector_pokemones[i - 1];
 		}
+		pokedex->vector_pokemones[pokemones_iterados - 1] = pokemon;
 	}
 
 	pokedex->cantidad_pokemones++;
 	return true;
 }
 
-size_t pokedex_cantidad_pokemones(struct pokedex *pokedex)
+size_t pokedex_cantidad_pokemones(struct pokedex *pokedex) // =====> O(1)
 {
 	return (!pokedex || !pokedex->cantidad_pokemones) ?
 		       0 :
@@ -139,46 +128,46 @@ const struct pokemon *pokedex_buscar_pokemon(struct pokedex *pokedex,
 		return NULL;
 	}
 
-	size_t posicion_del_pokemon = pokedex_iterar_pokemones(
+	size_t pokemones_iterados = pokedex_iterar_pokemones(
 		pokedex, buscar_pokemon, (void *)nombre);
 
-	if (posicion_del_pokemon == pokedex->cantidad_pokemones &&
-	    strcmp(pokedex->vector_pokemones[posicion_del_pokemon - 1].nombre,
+	if (pokemones_iterados == pokedex->cantidad_pokemones &&
+	    strcmp(pokedex->vector_pokemones[pokemones_iterados - 1].nombre,
 		   nombre) != 0) {
 		return NULL;
 	}
 
-	return &pokedex->vector_pokemones[posicion_del_pokemon - 1];
+	return &pokedex->vector_pokemones[pokemones_iterados - 1];
 }
 
 size_t pokedex_iterar_pokemones(struct pokedex *pokedex,
 				bool (*funcion)(struct pokemon *, void *),
-				void *ctx)
+				void *ctx) // ===== >O(n)
 {
 	if (!pokedex || !pokedex->vector_pokemones || !funcion ||
 	    pokedex->cantidad_pokemones == 0) {
 		return 0;
 	}
 
-	for (size_t i = 0; i < pokedex->cantidad_pokemones; i++) {
-		if (!(funcion(&pokedex->vector_pokemones[i], ctx))) {
+	for (size_t i = 0; i < pokedex->cantidad_pokemones; i++) { // n veces
+		if (!(funcion(&pokedex->vector_pokemones[i], ctx))) { // una funcion puede hacer algo k veces con el pokemon
 			return i + 1;
 		}
-	}
+	} // =====> O(n)
 
 	return pokedex->cantidad_pokemones;
 }
 
-void pokedex_destruir(struct pokedex *pokedex)
+void pokedex_destruir(struct pokedex *pokedex) // ====> O(n)
 {
 	if (pokedex) {
-		if (pokedex->vector_pokemones) {
+		if (pokedex->vector_pokemones) { // n veces
 			for (size_t i = 0; i < pokedex->cantidad_pokemones;
 			     i++) {
 				free(pokedex->vector_pokemones[i].nombre);
 			}
 			free(pokedex->vector_pokemones);
-		}
+		} // =====> O(n)
 		free(pokedex);
 	}
 }
