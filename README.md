@@ -178,6 +178,10 @@ Entonces hacemos las distintas comparaciones para saber donde se posiciona el po
 
 La manera de insertar es: encuentro la posicion, y corro todo un espacio a la derecha, siguiendo esta lógica, eso me cuesta `O(n)`, entonces tengo que las operaciones relevantes son `O(n*c + n)`, como `n*c` es dominante ante `O(n)`, nos quedamos con `O(n*c)`
 
+<div align="center">
+<img width="70%" src="img/pokemon_agregar.png">
+</div>
+
 ## `pokedex_cantidad_pokemones` O(1)
 
 Devuelve la cantidad de pokemones almacenado, y si algún parametro es NULL, entonces devolvemos 0;
