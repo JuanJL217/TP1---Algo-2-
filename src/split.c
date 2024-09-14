@@ -28,7 +28,8 @@ size_t cantidad_de_partes(const char *string, char separador) // =====> O(c)
 	return cantidad;
 }
 
-struct Partes *dividir_string(const char *string, char separador) // =====> O(cÂ²)
+struct Partes *dividir_string(const char *string,
+			      char separador) // =====> O(cÂ²)
 {
 	struct Partes *resultado = malloc(sizeof(struct Partes));
 	if (!resultado) {
@@ -48,6 +49,7 @@ struct Partes *dividir_string(const char *string, char separador) // =====> O(cÂ
 
 	size_t posicion = 0;
 	const char *inicio_string = string;
+
 	while (*string != FINAL_DEL_STRING) { // c veces
 		if (*string == separador) {
 			agregar_partes(resultado, inicio_string, string,
@@ -76,7 +78,7 @@ struct Partes *dividir_string(const char *string, char separador) // =====> O(cÂ
 }
 
 void liberar_partes(struct Partes *partes) // =====> O(m)
-{	
+{
 	if (partes) {
 		for (int i = 0; i < partes->cantidad; ++i) { // O(m)
 			free(partes->string[i]);

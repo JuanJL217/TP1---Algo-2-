@@ -43,9 +43,10 @@ struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
 	return inicializar_archivo;
 }
 
-size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
-		      bool (*funciones[])(const char *, void *),
-		      void *ctx[]) // =====> O(c² + m*c)
+size_t leer_linea_csv(
+	struct archivo_csv *archivo, size_t columnas,
+	bool (*funciones[])(const char *, void *),
+	void *ctx[]) // =====> O(c² + m*c + m) => O(c²)
 {
 	if (!archivo || !archivo->archivo || !funciones || !ctx) {
 		return 0;
@@ -60,10 +61,10 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 		return columna_posicion;
 	}
 
-	int valor_ascii;
+	int valor_numerico;
 
-	while ((valor_ascii = fgetc(archivo->archivo)) != EOF &&
-	       valor_ascii != '\n') { // c veces
+	while ((valor_numerico = fgetc(archivo->archivo)) != EOF &&
+	       valor_numerico != '\n') { // c veces
 		if (tamaño_del_texto >= (capacidad_linea * 75) / 100) {
 			if (!redimencionar_linea_texto(
 				    &texto,
@@ -72,12 +73,12 @@ size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
 				return columna_posicion;
 			}
 		}
-		texto[tamaño_del_texto++] = (char)valor_ascii;
+		texto[tamaño_del_texto++] = (char)valor_numerico;
 	} // ====> O(c²)
 
 	texto[tamaño_del_texto] = '\0';
 
-	if (tamaño_del_texto == 0 && valor_ascii == EOF) {
+	if (tamaño_del_texto == 0 && valor_numerico == EOF) {
 		free(texto);
 		return columna_posicion;
 	}
