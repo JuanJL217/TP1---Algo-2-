@@ -68,7 +68,7 @@ size_t leer_linea_csv(
 		if (tamaño_del_texto >= (capacidad_linea * 75) / 100) {
 			if (!redimencionar_linea_texto(
 				    &texto,
-				    &capacidad_linea)) { // O(c)
+				    &capacidad_linea)) { // k veces O(c), pero k se desprecia a medida que c crece.
 				free(texto);
 				return columna_posicion;
 			}
