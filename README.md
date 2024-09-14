@@ -40,7 +40,7 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 
 ## Consideraciones
 
-Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria al heap de manera dinamica, lo cual es O(1), por lo que si pido, tengo que liberar usando `free()`. inicializar\declarar una variable, if, break, operadores matematico son `O(1)`. Las funciones `strcpy` y `strcmp` son O(c).
+Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria al heap de manera dinamica, lo cual es O(1), por lo que si pido, tengo que liberar usando `free()`. inicializar\declarar una variable, if, break, operadores matematico son `O(1)`. Las funciones `strcpy` y `strcmp` son O(c), ya que se está comparando caracter por caracter.
 
 
 ### Estructura para la lectura de archivo
@@ -60,7 +60,7 @@ Al ser inicializaciones de malloc, inicializar variables, podemos decir que esta
 	struct archivo_csv *archivo_tp1 = abrir_archivo_csv(argv[1], ';');
 ```
 <div align="center">
-<img width="70%" src="img/abrir_archivo_csv.png">
+<img width="70%" src="img/inicializar_archivo_csv.png">
 </div>
 
 ---
@@ -120,6 +120,11 @@ Inicializamos la estructura pokedex donde almacenaremos los pokemones, será un 
 		malloc(CAPACIDAD_INICAL_POKEDEX * sizeof(struct pokemon));
 ```
 
+<div align="center">
+<img width="70%" src="img/inicializar_pokedex.png">
+</div>
+
+
 ## `pokedex_iterar_pokemones` O(n * g(h))
 
 En este caso prefiero mencionar la funcion que itera a los pokemons, porque es lo que usaré en 2 funciones de la pokedex. Esta funcion, al ser una iteracion, va a iterar, en el peor de los casos, a todos los pokemones que seria un costo de `O(n)`, o salir cuando la funcion que se pasa por parametro de `false`. Si iteramos 4 pokemones y al siguiente pokemon, que seria el 5to, da `falso`, retornamos 5, porque fue la cantidad de pokemones que nuestra función pudo iterar. Si sale del ciclo for, sabemos que iteró a todos los pokemones, o sea, retornamos la cantidad de pokemones que hay en la pokedex. Cabe destacar que, si aun no hemos agregado a un pokemon, siempre retornamos 0, porque no hay pokemon para iterar.
@@ -176,3 +181,14 @@ Devuelve la cantidad de pokemones almacenado, y si algún parametro es NULL, ent
 ## `pokedex_buscar_pokemon` O(n * c)
 
 Esta es otra función que también usé la función `pokedex_iterar_pokemones`, busca el pokemon y rompe donde: "Si el nombre del pokemon donde estoy parado en el vector, es igual al que estoy buscando, retorna `false`. Al ser una funcion que compara la cadena de caracteres, eso cuesta `O(c)`, por lo tanto, la función es `O(n * c)`;
+
+## `pokedex_destruir` O(n)
+
+Para destruir la pokedex, debemos liberar la memoria que hemos pedido, por lo que vamos a ir liberando desde lo más profundo, para afuera, así como en `liberar_partes` de `split.c`. Vamos a iterar cada posicion del vector de pokemones, y como mencioné cuando agregué pokemones, yo asigné memoria para el nombre, entonces debo liberar la memoria de cada nombre de todos los pokemones, una vez que hago eso, puedo liberar la memoria del vector que almacena pokemones, y luego la estructura de la pokedex, lo que pesa en esta función es la iteracion de los `n` pokemones, por eso es `O(n)`
+
+```c
+	for (size_t i = 0; i < pokedex->cantidad_pokemones;
+			i++) {
+		free(pokedex->vector_pokemones[i].nombre);
+	}
+```
