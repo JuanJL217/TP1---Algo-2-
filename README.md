@@ -27,7 +27,7 @@ valgrind ./tp1 ejemplos/pokedex.csv
 
 ---
 
-##  Funcionamiento
+##  Flujo del programa
 
 Para la implementación de este TP nos piden leer un archivo como argumento de un programa compilado.
 Tendrémos 2 estructuras, para la lectura de archivo y para almacenar elemento, en este caso, pokemones.
@@ -37,6 +37,7 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 <div align="center">
 <img width="70%" src="img/flujo_tp1.png">
 </div>
+
 
 ## Consideraciones
 
@@ -67,7 +68,7 @@ Al ser inicializaciones de malloc, inicializar variables, podemos decir que esta
 
 ## `leer_linea_csv` O(c²)
 
-En primer lugar, dentro de la función, como no sabemos cuantos caracteres van a ser, y no queremos tener un limite de caracteres,vamos a crear una variable `char* texto` de forma dinamica, donde almacenaremos la cadena de caracteres de una linea del archivo (de manera local dentro d ela función). Esta parte de la función se ejecuta `c` veces. De esta manera tenermos la linea de texto en una varible. En el peor de los casos, vamos a tener que redimencionar ese vector `k` veces, el costo de usar `realloc()` es `O(c)`, porque estamos pasando los caracteres del anterior bloque, esto hace que el ciclo quede: `n(O(k*c))`, pero como sabemos que `k` va a ser más chico que `c` a medida que vayan entrando más caracteres, nos queda `c(O(c))` => `O(c²)` (1).
+En primer lugar, dentro de la función, como no sabemos cuantos caracteres van a ser, y no queremos tener un limite de caracteres,vamos a crear una variable `char* texto` de forma dinamica, donde almacenaremos la cadena de caracteres de una linea del archivo (dentro de la función). Esta parte de la función se ejecuta `c` veces. De esta manera tenermos la linea de texto en una varible. En el peor de los casos, vamos a tener que redimencionar ese vector `k` veces, el costo de usar `realloc()` es `O(c)`, porque estamos pasando los caracteres del anterior bloque, esto hace que el ciclo quede: `n(O(k*c))`, pero como sabemos que `k` va a ser más chico que `c` a medida que vayan entrando más caracteres, nos queda `c(O(c))` => `O(c²)` (1).
 ```c
 	while ((valor_ascii = fgetc(archivo->archivo)) != EOF &&
 	       valor_ascii != '\n') {
@@ -84,6 +85,9 @@ Si iteramos y no vemos un caracter separador dentro del while, significa que har
 ```c
 	struct Partes *partes = dividir_string(texto, archivo->separador);
 ```
+<div align="center">
+<img width="70%" src="img/inicializar_struct_partes.png">
+</div>
 
 De ahí entramos en un ciclo while, la cual va a estar usando puntero a funciones y punteros a void, esta parte de la función. Al ser un ciclo que dependa de la cantidad de columnas, decimos que el ciclo while es `O(m)`, siendo `m` la cantidad de columnas que tiene cada texto (cada columna es definido por el separador), pero adentro de la funcion, tenemos lo que son las funciones de parseo, en el peor de los casos, todos van a ser string, y al hacer `strcpy` y dependerán de la cantidad de caracteres que haya, siendo entonces O(c), entonces nos queda que el ciclo es `m(O(c))` => `O(m*c)` (3) No seria solo `O(c)`, porque estariamos ignorando el impacto del peor caso, que sean muchas columnas para procesar. Si salimos del ciclo while por su condición, sabemos que iteró todas las columnas, por eso al final hay un `return columas`. Si en alguna función es NULL e iba en la tercera iteracion, decimos que itero solo 2 veces, pero si en la tercera iteracion dio falso, decimos que iteró 3 veces.
 
@@ -101,7 +105,7 @@ Mencionar que, hacer free(partes), nos cuesta `O(m)` (4), ya que vamos a liberar
 	}
 ```
 
-Entonces nos quedaria en total que la función queda como `O(c²)`(1) + `O(c²)`(2) + `O(m*c)`(3) + `O(m)`(4) => `O(2c² + m*c + m)`, `2` al ser una constante, se toma como `1`; ahora bien, tenemos estas 3 variables `c²`, `m*c` y `c`. En el peor de los casos, la division y copias de subcadenas tienes una complejidad de `O(c²)`, y en ese peor caso, la `m` puede ser proporcional a `c`, o sea, peude ser `O(c)`, o sea, el peor caso es que cada caracter tengas un seprador, que puede llegar a ser tan grande como `c`, por ejemplo: ";;;;;;", con serparador ';', aquí podemos ver que la cantidad de columnas `m`, será proporcional a `c`, porque habrá `c+1` columnas, o sea, `c` columnas. Entonces recorreremos el arreglo `c` veces y agregagremos las partes, aunque sean vacias, `c` veces, entonces llegamos a la conclusión de que, `m` puede llegar a `c`, `m -> c` => `O(c² + c*c + c)`, lo que conlleva a que esta función sea `O(c²)` en el peor de los casos.
+Entonces nos quedaria en total que la función queda como `O(c²)`(1) + `O(c²)`(2) + `O(m*c)`(3) + `O(m)`(4) => `O(2c² + m*c + m)`, `2` al ser una constante, se toma como `1`; ahora bien, tenemos estas 3 variables `c²`, `m*c` y `c`. el termino de mayor orden es `c²`, porque en el infinito, los terminos de menos orden se desprecian. Entonces nos queda que la complejidad computacional es `O(c²)`.
 
 ## `cerrar_archivo_csv` O(1)
 
