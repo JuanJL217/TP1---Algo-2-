@@ -41,8 +41,8 @@ Acá muestro un diagrama de como sería el flujo del TP para que haga lo que nos
 
 ## Consideraciones
 
-c = cantidad de caracteres.\n
-m = cantidad de columnas.\n
+c = cantidad de caracteres.  
+m = cantidad de columnas.  
 n = cantidad de pokemones.
 
 Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria al heap de manera dinamica, lo cual es O(1), por lo que si pido, tengo que liberar usando `free()`. inicializar\declarar una variable, if, break, operadores matematico son `O(1)`. Las funciones `strcpy` y `strcmp` son O(c), ya que se está comparando caracter por caracter.
