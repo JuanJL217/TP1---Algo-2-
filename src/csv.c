@@ -11,7 +11,7 @@ struct archivo_csv {
 	char separador;
 };
 
-bool redimencionar_linea_texto(char **texto, size_t *capacidad) // ====> O(c)
+bool redimencionar_vector_texto(char **texto, size_t *capacidad) // ====> O(c)
 {
 	*capacidad *= FACTOR_CRECIMIENTO_LINEA;
 	char *nuevo_bloque_texto =
@@ -21,6 +21,12 @@ bool redimencionar_linea_texto(char **texto, size_t *capacidad) // ====> O(c)
 	}
 	*texto = nuevo_bloque_texto;
 	return true;
+}
+
+bool esta_llegando_al_tope_del_vector_texto(size_t tamaño_texto,
+					    size_t capacidad_linea) // O(1)
+{
+	return tamaño_texto >= (capacidad_linea * 75) / 100;
 }
 
 struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
@@ -43,17 +49,15 @@ struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
 	return inicializar_archivo;
 }
 
-size_t leer_linea_csv(
-	struct archivo_csv *archivo, size_t columnas,
-	bool (*funciones[])(const char *, void *),
-	void *ctx[]) // =====> O(c² + m*c + m) => O(c²)
+size_t leer_linea_csv(struct archivo_csv *archivo, size_t columnas,
+		      bool (*funciones[])(const char *, void *),
+		      void *ctx[]) // =====> O(c² + m*c + m) => O(c²)
 {
 	if (!archivo || !archivo->archivo || !funciones || !ctx) {
 		return 0;
 	}
 
 	size_t columna_posicion = 0;
-
 	size_t capacidad_linea = CAPACIDAD_INICIAL_CSV;
 	size_t tamaño_del_texto = 0;
 	char *texto = malloc(capacidad_linea * sizeof(char));
@@ -61,24 +65,25 @@ size_t leer_linea_csv(
 		return columna_posicion;
 	}
 
-	int valor_numerico;
+	int codigo = getc(archivo->archivo);
 
-	while ((valor_numerico = fgetc(archivo->archivo)) != EOF &&
-	       valor_numerico != '\n') { // c veces
-		if (tamaño_del_texto >= (capacidad_linea * 75) / 100) {
-			if (!redimencionar_linea_texto(
-				    &texto,
-				    &capacidad_linea)) { // k veces O(c), pero k se desprecia a medida que c crece.
-				free(texto);
-				return columna_posicion;
-			}
+	while (codigo != EOF && codigo != '\n') { // c veces
+		if (esta_llegando_al_tope_del_vector_texto(tamaño_del_texto,
+							   capacidad_linea) &&
+		    !redimencionar_vector_texto(
+			    &texto,
+			    &capacidad_linea)) { // k veces O(c), pero k se desprecia a medida que c crece.
+			free(texto);
+			return columna_posicion;
 		}
-		texto[tamaño_del_texto++] = (char)valor_numerico;
+		texto[tamaño_del_texto] = (char)codigo;
+		tamaño_del_texto++;
+		codigo = getc(archivo->archivo);
 	} // ====> O(c²)
 
 	texto[tamaño_del_texto] = '\0';
 
-	if (tamaño_del_texto == 0 && valor_numerico == EOF) {
+	if (tamaño_del_texto == 0) {
 		free(texto);
 		return columna_posicion;
 	}
@@ -87,11 +92,7 @@ size_t leer_linea_csv(
 		dividir_string(texto, archivo->separador); // O(c²)
 	free(texto);
 
-	if (!partes) {
-		return columna_posicion;
-	}
-
-	if (partes->cantidad == 0 || partes->cantidad < columnas) {
+	if (!partes || partes->cantidad == 0 || partes->cantidad < columnas) {
 		liberar_partes(partes);
 		return columna_posicion;
 	}
