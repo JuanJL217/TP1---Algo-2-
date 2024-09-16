@@ -27,7 +27,8 @@ bool redimensionar_vector_pokemones(struct pokedex *pokedex) // =====> O(n)
 	return true;
 }
 
-bool buscar_posicion(struct pokemon *pokemon_actual, void *nombre_pokemon) // =====> O(c)
+bool buscar_posicion(struct pokemon *pokemon_actual,
+		     void *nombre_pokemon) // =====> O(c)
 {
 	return !(strcmp(pokemon_actual->nombre, (char *)nombre_pokemon) > 0);
 }
@@ -39,20 +40,27 @@ bool buscar_pokemon(struct pokemon *pokemon_actual, // =====> O(c)
 			(const char *)nombre_pokemon_a_buscar) == 0);
 }
 
-bool nombre_pokemon_en_el_vector_es_menor(char *nombre_pokemon_en_vector, // =====> O(c)
-					  char *nombre_pokemon_nuevo)
+bool nombre_pokemon_en_el_vector_es_menor(
+	char *nombre_pokemon_en_vector, // =====> O(c)
+	char *nombre_pokemon_nuevo)
 {
 	return strcmp(nombre_pokemon_en_vector, nombre_pokemon_nuevo) < 0;
 }
 
-bool es_el_ultimo_pokemon(size_t pokemones_iterados, size_t cantidad_pokemones) // ====> O(1)
+bool es_el_ultimo_pokemon(size_t pokemones_iterados,
+			  size_t cantidad_pokemones) // ====> O(1)
 {
 	return pokemones_iterados == cantidad_pokemones;
 }
 
-bool pokemon_no_encontrado(size_t cant_pokemones_iterados, size_t cantidad_pokemones, struct pokemon* vector_pokemones, const char* nombre_a_buscar)
+bool pokemon_no_encontrado(size_t cant_pokemones_iterados,
+			   size_t cantidad_pokemones,
+			   struct pokemon *vector_pokemones,
+			   const char *nombre_a_buscar)
 {
-	return cant_pokemones_iterados == cantidad_pokemones && strcmp(vector_pokemones[cantidad_pokemones - 1].nombre, nombre_a_buscar) != 0;
+	return cant_pokemones_iterados == cantidad_pokemones &&
+	       strcmp(vector_pokemones[cantidad_pokemones - 1].nombre,
+		      nombre_a_buscar) != 0;
 }
 
 //*********** FUNCIONES PRINCIPALES **********
@@ -74,8 +82,9 @@ struct pokedex *pokedex_crear()
 	return inicializar_pokedex;
 }
 
-bool pokedex_agregar_pokemon(struct pokedex *pokedex, struct pokemon pokemon) // ====>
-{ 
+bool pokedex_agregar_pokemon(struct pokedex *pokedex,
+			     struct pokemon pokemon) // ====>
+{
 	if (!pokedex || !pokemon.nombre) {
 		return false;
 	}
@@ -136,7 +145,9 @@ const struct pokemon *pokedex_buscar_pokemon(struct pokedex *pokedex,
 	size_t cantidad_iterados = pokedex_iterar_pokemones(
 		pokedex, buscar_pokemon, (void *)nombre);
 
-	if (pokemon_no_encontrado(cantidad_iterados, pokedex->cantidad_pokemones, pokedex->vector_pokemones, nombre)) {
+	if (pokemon_no_encontrado(cantidad_iterados,
+				  pokedex->cantidad_pokemones,
+				  pokedex->vector_pokemones, nombre)) {
 		return NULL; // O(c)
 	}
 
@@ -145,7 +156,7 @@ const struct pokemon *pokedex_buscar_pokemon(struct pokedex *pokedex,
 
 size_t pokedex_iterar_pokemones(struct pokedex *pokedex,
 				bool (*funcion)(struct pokemon *, void *),
-				void *ctx) // ===== >O(n)
+				void *ctx) // ===== >O(n * g(h))
 {
 	if (!pokedex || !pokedex->vector_pokemones || !funcion ||
 	    pokedex->cantidad_pokemones == 0) {
@@ -153,9 +164,8 @@ size_t pokedex_iterar_pokemones(struct pokedex *pokedex,
 	}
 
 	for (size_t i = 0; i < pokedex->cantidad_pokemones; i++) { // n veces
-		if (!(funcion(
-			    &pokedex->vector_pokemones[i],
-			    ctx))) { // una funcion puede hacer algo k veces con el pokemon
+		if (!(funcion(&pokedex->vector_pokemones[i],
+			      ctx))) { // g(H)
 			return i + 1;
 		}
 	} // =====> O(n)

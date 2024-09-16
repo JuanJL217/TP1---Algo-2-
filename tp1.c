@@ -76,6 +76,8 @@ struct tipos_pokemon inicializar_tipos()
 	return tipos_totales;
 }
 
+// ------- MAIN DEL PROGRAMA -------
+
 int main(int argc, char const *argv[])
 {
 	if (argc < 2) {

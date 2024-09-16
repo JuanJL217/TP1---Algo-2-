@@ -11,6 +11,8 @@ struct archivo_csv {
 	char separador;
 };
 
+// ------ FUNCIONES EXTRAS --------
+
 bool redimencionar_vector_texto(char **texto, size_t *capacidad) // ====> O(c)
 {
 	*capacidad *= FACTOR_CRECIMIENTO_LINEA;
@@ -28,6 +30,8 @@ bool esta_llegando_al_tope_del_vector_texto(size_t tamaño_texto,
 {
 	return tamaño_texto >= (capacidad_linea * 75) / 100;
 }
+
+// -------- FUNCIONES PRINCIPALES --------
 
 struct archivo_csv *abrir_archivo_csv(const char *nombre_archivo,
 				      char separador) //  =====> O(1)

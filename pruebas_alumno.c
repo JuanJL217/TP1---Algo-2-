@@ -3,6 +3,8 @@
 #include "src/pokedex.h"
 #include <string.h>
 
+// ------- FFUNCIONES EXTRAS PARA LOS TESTS -------
+
 bool leer_int(const char *str, void *ctx)
 {
 	return sscanf(str, "%d", (int *)ctx) == 1;
@@ -24,15 +26,15 @@ bool leer_caracter(const char *str, void *ctx)
 	return true;
 }
 
-bool mostrar_pokemon(struct pokemon* pokemon, void* nada)
+bool mostrar_pokemon(struct pokemon *pokemon, void *nada)
 {
 	printf("%s\n", pokemon->nombre);
 	return true;
 }
 
-bool buscar_pokemon_que_inicie_con(struct pokemon* pokemon, void* letra)
+bool buscar_pokemon_que_inicie_con(struct pokemon *pokemon, void *letra)
 {
-	return !(pokemon->nombre[0] == *(char*) letra);
+	return !(pokemon->nombre[0] == *(char *)letra);
 }
 
 void agregar_valores(struct pokemon *pokemon, const char *nombre)
@@ -47,6 +49,8 @@ void agregar_valores(struct pokemon *pokemon, const char *nombre)
 	pokemon->destreza = 0;
 	pokemon->resistencia = 0;
 }
+
+// ------- INICIO DE LOS TESTS ---------
 
 void abrirUnArchivoInexistenteDebeRetornarNull()
 {
@@ -184,20 +188,23 @@ void agregarVariosPokemones()
 
 void agregarPokemonesRepetidos()
 {
-	struct pokedex* pokedex = pokedex_crear();
-	char* pokemones[] = {"Charmande", "Charmander", "Charmander", "Charmander", "Charmander"};
+	struct pokedex *pokedex = pokedex_crear();
+	char *pokemones[] = { "Charmande", "Charmander", "Charmander",
+			      "Charmander", "Charmander" };
 	struct pokemon pokemon;
 	pokemon.nombre = NULL;
 	for (size_t i = 0; i < 5; i++) {
-		pokemon.nombre = malloc((strlen(pokemones[i]) + 1) * sizeof(char));
+		pokemon.nombre =
+			malloc((strlen(pokemones[i]) + 1) * sizeof(char));
 		agregar_valores(&pokemon, pokemones[i]);
 		pokedex_agregar_pokemon(pokedex, pokemon);
 		free(pokemon.nombre);
 	}
 
-	pa2m_afirmar(pokedex_cantidad_pokemones(pokedex) == 5, "Se agregan 5 pokemones con mismo nombre, hay 5 pokemones en la pokedex");
+	pa2m_afirmar(
+		pokedex_cantidad_pokemones(pokedex) == 5,
+		"Se agregan 5 pokemones con mismo nombre, hay 5 pokemones en la pokedex");
 	pokedex_destruir(pokedex);
-
 }
 
 void buscarUnPokemonEnPokedexVacio()
@@ -214,7 +221,8 @@ void buscarUnPokemonEnPokedexVacio()
 void agregarPokemonYBuscar()
 {
 	struct pokedex *pokedex = pokedex_crear();
-	char *nombres_pokemon[] = {"Torchic" , "Bulbasaur", "Lucario", "Mario Bros"};
+	char *nombres_pokemon[] = { "Torchic", "Bulbasaur", "Lucario",
+				    "Mario Bros" };
 	struct pokemon pokemon;
 
 	// Agrega primer pokemon
@@ -225,7 +233,10 @@ void agregarPokemonYBuscar()
 	}
 	pokedex_agregar_pokemon(pokedex, pokemon);
 	free(pokemon.nombre);
-	pa2m_afirmar(strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[0])->nombre, nombres_pokemon[0]) == 0,
+	pa2m_afirmar(
+		strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[0])
+			       ->nombre,
+		       nombres_pokemon[0]) == 0,
 		"Agrear un pokemon y buscar su nombre, devuelve el puntero al pokemon guardado");
 
 	// Agrega segundo pokemon
@@ -255,10 +266,23 @@ void agregarPokemonYBuscar()
 	}
 	pokedex_agregar_pokemon(pokedex, pokemon);
 	free(pokemon.nombre);
-	pa2m_afirmar(strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[0])->nombre, nombres_pokemon[0]) == 0, "Agregar un tercer pokemon y busca al primer que ingresé, devuelve el puntero");
-	pa2m_afirmar(strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[1])->nombre, nombres_pokemon[1]) == 0, "Agregar un tercer pokemon y busca el segundo que ingresé, devuele su puntero");
-	pa2m_afirmar(strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[2])->nombre, nombres_pokemon[2]) == 0, "Buscar el tercer pokemon, devuelve puntero al pokemon");
-	pa2m_afirmar(pokedex_buscar_pokemon(pokedex, nombres_pokemon[3]) == NULL, "Buscar un pokemon que no ingresé, devuelve NULL");
+	pa2m_afirmar(
+		strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[0])
+			       ->nombre,
+		       nombres_pokemon[0]) == 0,
+		"Agregar un tercer pokemon y busca al primer que ingresé, devuelve el puntero");
+	pa2m_afirmar(
+		strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[1])
+			       ->nombre,
+		       nombres_pokemon[1]) == 0,
+		"Agregar un tercer pokemon y busca el segundo que ingresé, devuele su puntero");
+	pa2m_afirmar(strcmp(pokedex_buscar_pokemon(pokedex, nombres_pokemon[2])
+				    ->nombre,
+			    nombres_pokemon[2]) == 0,
+		     "Buscar el tercer pokemon, devuelve puntero al pokemon");
+	pa2m_afirmar(pokedex_buscar_pokemon(pokedex, nombres_pokemon[3]) ==
+			     NULL,
+		     "Buscar un pokemon que no ingresé, devuelve NULL");
 	pokedex_destruir(pokedex);
 }
 
@@ -290,32 +314,43 @@ void agregarPokemonesRepetidosYBuscar()
 
 void iterarPokedexVacia()
 {
-	struct pokedex* pokedex = pokedex_crear();
-	pa2m_afirmar(pokedex_iterar_pokemones(NULL, mostrar_pokemon, NULL) == 0, "No pasar la pokedex, retorna 0 iteraciones");
-	pa2m_afirmar(pokedex_iterar_pokemones(pokedex, mostrar_pokemon, NULL) == 0, "Crear una pokedex, al no tener pokemones, da 0 iteraciones");
-	pa2m_afirmar(pokedex_iterar_pokemones(pokedex, NULL, NULL) == 0, "Pasar puntero a NULL, da 0 iteraciones");
+	struct pokedex *pokedex = pokedex_crear();
+	pa2m_afirmar(pokedex_iterar_pokemones(NULL, mostrar_pokemon, NULL) == 0,
+		     "No pasar la pokedex, retorna 0 iteraciones");
+	pa2m_afirmar(
+		pokedex_iterar_pokemones(pokedex, mostrar_pokemon, NULL) == 0,
+		"Crear una pokedex, al no tener pokemones, da 0 iteraciones");
+	pa2m_afirmar(pokedex_iterar_pokemones(pokedex, NULL, NULL) == 0,
+		     "Pasar puntero a NULL, da 0 iteraciones");
 	pokedex_destruir(pokedex);
 }
 
 void iteraYSePuedeDetener()
 {
-	struct pokedex* pokedex = pokedex_crear();
-	char *nombres_pokemon[] = { "Mimiau", "Onix", "Ratata", "Snorlax"};
+	struct pokedex *pokedex = pokedex_crear();
+	char *nombres_pokemon[] = { "Mimiau", "Onix", "Ratata", "Snorlax" };
 	struct pokemon pokemon;
 	pokemon.nombre = NULL;
 	for (size_t i = 0; i < 4; i++) {
 		agregar_valores(&pokemon, nombres_pokemon[i]);
 		if (!pokemon.nombre) {
-		pokedex_destruir(pokedex);
-		return;
+			pokedex_destruir(pokedex);
+			return;
 		}
 		pokedex_agregar_pokemon(pokedex, pokemon);
 		free(pokemon.nombre);
 	}
 	char nombre_iniciada_con_R = 'R';
 	char nombre_iniciada_con_A = 'A';
-	pa2m_afirmar(pokedex_iterar_pokemones(pokedex, buscar_pokemon_que_inicie_con, &nombre_iniciada_con_R) == 3, "Buscar un pokemon y que corte por su condicion, retorna la cantidad de pokemones iterados");
-	pa2m_afirmar(pokedex_iterar_pokemones(pokedex, buscar_pokemon_que_inicie_con, &nombre_iniciada_con_A) == pokedex_cantidad_pokemones(pokedex), "Buscar un pokemon y que no corte por su condicion, itera todos los pokemones");
+	pa2m_afirmar(
+		pokedex_iterar_pokemones(pokedex, buscar_pokemon_que_inicie_con,
+					 &nombre_iniciada_con_R) == 3,
+		"Buscar un pokemon y que corte por su condicion, retorna la cantidad de pokemones iterados");
+	pa2m_afirmar(
+		pokedex_iterar_pokemones(pokedex, buscar_pokemon_que_inicie_con,
+					 &nombre_iniciada_con_A) ==
+			pokedex_cantidad_pokemones(pokedex),
+		"Buscar un pokemon y que no corte por su condicion, itera todos los pokemones");
 	pokedex_destruir(pokedex);
 }
 
