@@ -48,9 +48,6 @@ n = cantidad de pokemones.
 Teniendo en cuenta que cada vez que hago uso de un `malloc()` significa que pido bloque(s) de memoria en el heap de manera dinamica, lo cual es `O(1)`, por lo que si pido, tengo que liberar usando `free()`.  
 inicializar\declarar una variable, if, break, operadores matematico son `O(1)`. Las funciones `strcpy` y `strcmp` son `O(c)`, ya que se está comparando caracter por caracter.
 
-
-### Estructura para la lectura de archivo
-
 # csv.c
 
 ## `abrir_archivo_csv` O(1)
@@ -194,7 +191,7 @@ Entonces hacemos las distintas comparaciones para saber donde se posiciona el po
 		pokedex->vector_pokemones[pokemones_iterados] = pokemon;
 ```
 
-La manera de insertar es: encuentro la posicion, y corro todo un espacio a la derecha, siguiendo esta lógica, eso me cuesta `O(n)`, entonces tengo que las operaciones relevantes son `O(n*c + n)`, como `n*c` es dominante ante `n`, nos quedamos con `O(n * c)`
+La manera de insertar es: encuentro la posicion, y corro todo un espacio a la derecha, siguiendo esta lógica, eso me cuesta `O(n)`, ya que no sé cuantos pokemones voy a mover a la derecha para darle lugar al nuevo pokemon, entonces tengo que las operaciones relevantes son `O(n*c + n)`, como `n*c` es dominante ante `n`, nos quedamos con `O(n * c)`
 
 <div align="center">
 <img width="70%" src="img/pokemon_agregar.png">
@@ -216,7 +213,7 @@ Esta es otra función que también usé la función `pokedex_iterar_pokemones`, 
 	}
 ```
 
-Quiero destacar que en esta función, hubiese hecho una busqueda binarioa, siendo así mejor optimizada y quedando `O(log(n))`, ya que voy agarrando mitad de la mitad de la mitad y así hasta encontrar el elemento buscado, pero preferí no hacerlo y demostrar el uso de puntero a funciones y manipulación de `void*`.
+Quiero destacar que en esta función, hubiese hecho una busqueda binarioa, ya que los pokemones están ordenados, siendo así mejor optimizada y quedando la complejidad computacional en `O(log(n))`, ya que voy agarrando el punteo medio del punto medio de la mitad de `n` pokemones hasta encontrar el pokemon, pero preferí no hacerlo y demostrar el uso de puntero a funciones y manipulación de `void*`.
 
 ## `pokedex_destruir` O(n)
 
